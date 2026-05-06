@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "bm25-kotlin"
+

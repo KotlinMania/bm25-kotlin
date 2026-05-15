@@ -444,7 +444,7 @@ cargo add bm25 --features parallelism
 
 ```kotlin
 dependencies {
-    implementation("io.github.kotlinmania:bm25-kotlin:0.1.0-SNAPSHOT")
+    implementation("io.github.kotlinmania:bm25-kotlin:0.1.0")
 }
 ```
 

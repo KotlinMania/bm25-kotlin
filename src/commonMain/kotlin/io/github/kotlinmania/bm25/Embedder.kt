@@ -1,6 +1,7 @@
 // port-lint: source src/embedder.rs
 package io.github.kotlinmania.bm25
 
+typealias DefaultTokenEmbedder = UInt
 typealias DefaultEmbeddingSpace = UInt
 
 /**
@@ -127,6 +128,22 @@ class EmbedderBuilder<S, T : Tokenizer> private constructor(
         /**
          * Constructs a new EmbedderBuilder with the given average document length. Use this if
          * you know the average document length in advance. If you don't, but you have your full
+         * corpus ahead of time, use [withFitToCorpus] or [withTokenizerAndFitToCorpus] instead.
+         *
+         * If you have neither the full corpus nor a sample of it, you can configure the embedder
+         * to disregard document length by setting `b` to 0.0. In this case, it doesn't matter
+         * what value you pass to `withAvgdl`.
+         *
+         * The average document length is the average number of tokens in a document from your
+         * corpus; if you need access to this value, you can construct an Embedder and call
+         * [Embedder.avgdl] on it.
+         */
+        fun withAvgdl(avgdl: Float): EmbedderBuilder<DefaultTokenEmbedder, DefaultTokenizer> =
+            withAvgdl(UIntTokenEmbedder, DefaultTokenizer.default(), avgdl)
+
+        /**
+         * Constructs a new EmbedderBuilder with the given average document length. Use this if
+         * you know the average document length in advance. If you don't, but you have your full
          * corpus ahead of time, use [withTokenizerAndFitToCorpus] instead.
          *
          * If you have neither the full corpus nor a sample of it, you can configure the embedder
@@ -176,5 +193,63 @@ class EmbedderBuilder<S, T : Tokenizer> private constructor(
                 avgdl = avgdl,
             )
         }
+
+        /**
+         * Constructs a new EmbedderBuilder with its average document length fit to the given
+         * corpus. Use this if you have the full corpus (or a sample of it) available in advance.
+         * This function uses the default tokenizer configured with the input language mode. The
+         * embedder will assume this tokenizer.
+         */
+        fun <S> withFitToCorpus(
+            tokenEmbedder: TokenEmbedder<S>,
+            languageMode: LanguageMode,
+            corpus: List<String>,
+        ): EmbedderBuilder<S, DefaultTokenizer> {
+            val tokenizer = DefaultTokenizer.new(languageMode)
+            return withTokenizerAndFitToCorpus(tokenEmbedder, tokenizer, corpus)
+        }
+
+        /**
+         * Constructs a new EmbedderBuilder with its average document length fit to the given
+         * corpus, using a fixed tokenizer language.
+         */
+        fun <S> withFitToCorpus(
+            tokenEmbedder: TokenEmbedder<S>,
+            language: Language,
+            corpus: List<String>,
+        ): EmbedderBuilder<S, DefaultTokenizer> =
+            withFitToCorpus(tokenEmbedder, LanguageMode.from(language), corpus)
+
+        /**
+         * Constructs a new EmbedderBuilder with its average document length fit to the given
+         * corpus, using the default token embedder and default tokenizer.
+         */
+        fun withFitToCorpus(
+            languageMode: LanguageMode,
+            corpus: List<String>,
+        ): EmbedderBuilder<DefaultTokenEmbedder, DefaultTokenizer> =
+            withFitToCorpus(UIntTokenEmbedder, languageMode, corpus)
+
+        /**
+         * Constructs a new EmbedderBuilder with its average document length fit to the given
+         * corpus, using the default token embedder and a fixed tokenizer language.
+         */
+        fun withFitToCorpus(
+            language: Language,
+            corpus: List<String>,
+        ): EmbedderBuilder<DefaultTokenEmbedder, DefaultTokenizer> =
+            withFitToCorpus(LanguageMode.from(language), corpus)
     }
 }
+
+/** Sets the language mode for the embedder tokenizer. */
+fun <S> EmbedderBuilder<S, DefaultTokenizer>.languageMode(
+    languageMode: LanguageMode,
+): EmbedderBuilder<S, DefaultTokenizer> =
+    tokenizer(DefaultTokenizer.new(languageMode))
+
+/** Sets the language mode for the embedder tokenizer. */
+fun <S> EmbedderBuilder<S, DefaultTokenizer>.languageMode(
+    language: Language,
+): EmbedderBuilder<S, DefaultTokenizer> =
+    languageMode(LanguageMode.from(language))

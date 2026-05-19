@@ -143,6 +143,22 @@ class SearchEngineBuilder<K, S, T : Tokenizer> private constructor(
         /**
          * Constructs a new SearchEngineBuilder with the given average document length. Use this
          * if you know the average document length in advance. If you don't, but you have your
+         * full corpus ahead of time, use [withDocuments] or [withCorpus] instead.
+         *
+         * If you have neither the full corpus nor a sample of it, you can configure the embedder
+         * to disregard document length by setting `b` to 0.0. In this case, it doesn't matter
+         * what value you pass to `withAvgdl`.
+         *
+         * The average document length is the average number of tokens in a document from your
+         * corpus; if you need access to this value, you can construct an Embedder and call
+         * [Embedder.avgdl] on it.
+         */
+        fun <K> withAvgdl(avgdl: Float): SearchEngineBuilder<K, DefaultTokenEmbedder, DefaultTokenizer> =
+            withAvgdl(UIntTokenEmbedder, DefaultTokenizer.default(), avgdl)
+
+        /**
+         * Constructs a new SearchEngineBuilder with the given average document length. Use this
+         * if you know the average document length in advance. If you don't, but you have your
          * full corpus ahead of time, use [withTokenizerAndDocuments] or
          * [withTokenizerAndCorpus] instead.
          *
@@ -201,5 +217,105 @@ class SearchEngineBuilder<K, S, T : Tokenizer> private constructor(
             }
             return withTokenizerAndDocuments(tokenEmbedder, tokenizer, documents)
         }
+
+        /**
+         * Constructs a new SearchEngineBuilder with the given documents. The search engine will
+         * fit to the given documents, using the default tokenizer configured with the given
+         * language mode. When you call [build], the builder will pre-populate the search engine
+         * with the given documents, and pass on the tokenizer.
+         */
+        fun <K, S> withDocuments(
+            tokenEmbedder: TokenEmbedder<S>,
+            languageMode: LanguageMode,
+            documents: Iterable<Document<K>>,
+        ): SearchEngineBuilder<K, S, DefaultTokenizer> =
+            withTokenizerAndDocuments(tokenEmbedder, DefaultTokenizer.new(languageMode), documents)
+
+        /**
+         * Constructs a new SearchEngineBuilder with the given documents, using a fixed tokenizer
+         * language.
+         */
+        fun <K, S> withDocuments(
+            tokenEmbedder: TokenEmbedder<S>,
+            language: Language,
+            documents: Iterable<Document<K>>,
+        ): SearchEngineBuilder<K, S, DefaultTokenizer> =
+            withDocuments(tokenEmbedder, LanguageMode.from(language), documents)
+
+        /**
+         * Constructs a new SearchEngineBuilder with the given documents, using the default token
+         * embedder and default tokenizer.
+         */
+        fun <K> withDocuments(
+            languageMode: LanguageMode,
+            documents: Iterable<Document<K>>,
+        ): SearchEngineBuilder<K, DefaultTokenEmbedder, DefaultTokenizer> =
+            withDocuments(UIntTokenEmbedder, languageMode, documents)
+
+        /**
+         * Constructs a new SearchEngineBuilder with the given documents, using the default token
+         * embedder and a fixed tokenizer language.
+         */
+        fun <K> withDocuments(
+            language: Language,
+            documents: Iterable<Document<K>>,
+        ): SearchEngineBuilder<K, DefaultTokenEmbedder, DefaultTokenizer> =
+            withDocuments(LanguageMode.from(language), documents)
+
+        /**
+         * Constructs a new SearchEngineBuilder with the corpus. The search engine will fit to
+         * the given corpus, using the default tokenizer configured with the given language mode.
+         * When you call [build], the builder will pre-populate the search engine with the given
+         * corpus and pass on the tokenizer. This function will automatically generate [UInt] ids
+         * for each entry in your corpus.
+         */
+        fun <S> withCorpus(
+            tokenEmbedder: TokenEmbedder<S>,
+            languageMode: LanguageMode,
+            corpus: Iterable<String>,
+        ): SearchEngineBuilder<UInt, S, DefaultTokenizer> =
+            withTokenizerAndCorpus(tokenEmbedder, DefaultTokenizer.new(languageMode), corpus)
+
+        /**
+         * Constructs a new SearchEngineBuilder with the corpus, using a fixed tokenizer language.
+         */
+        fun <S> withCorpus(
+            tokenEmbedder: TokenEmbedder<S>,
+            language: Language,
+            corpus: Iterable<String>,
+        ): SearchEngineBuilder<UInt, S, DefaultTokenizer> =
+            withCorpus(tokenEmbedder, LanguageMode.from(language), corpus)
+
+        /**
+         * Constructs a new SearchEngineBuilder with the corpus, using the default token embedder
+         * and default tokenizer.
+         */
+        fun withCorpus(
+            languageMode: LanguageMode,
+            corpus: Iterable<String>,
+        ): SearchEngineBuilder<UInt, DefaultTokenEmbedder, DefaultTokenizer> =
+            withCorpus(UIntTokenEmbedder, languageMode, corpus)
+
+        /**
+         * Constructs a new SearchEngineBuilder with the corpus, using the default token embedder
+         * and a fixed tokenizer language.
+         */
+        fun withCorpus(
+            language: Language,
+            corpus: Iterable<String>,
+        ): SearchEngineBuilder<UInt, DefaultTokenEmbedder, DefaultTokenizer> =
+            withCorpus(LanguageMode.from(language), corpus)
     }
 }
+
+/** Sets the tokenizer to the default tokenizer with the given language mode. */
+fun <K, S> SearchEngineBuilder<K, S, DefaultTokenizer>.languageMode(
+    languageMode: LanguageMode,
+): SearchEngineBuilder<K, S, DefaultTokenizer> =
+    tokenizer(DefaultTokenizer.new(languageMode))
+
+/** Sets the tokenizer to the default tokenizer with the given language mode. */
+fun <K, S> SearchEngineBuilder<K, S, DefaultTokenizer>.languageMode(
+    language: Language,
+): SearchEngineBuilder<K, S, DefaultTokenizer> =
+    languageMode(LanguageMode.from(language))

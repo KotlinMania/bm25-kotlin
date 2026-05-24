@@ -1,4 +1,5 @@
 {
+  "parity_mode": false,
   "name": "bm25-kotlin",
   "source": {
     "path": "tmp/bm25/src",

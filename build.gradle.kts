@@ -379,6 +379,8 @@ rootProject.extensions.configure<YarnRootExtension>("kotlinYarn") {
     resolution("**/socket.io-parser", "4.2.6")
     resolution("ws", "8.20.1")
     resolution("**/ws", "8.20.1")
+    resolution("tmp", "0.2.6")
+    resolution("**/tmp", "0.2.6")
 }
 
 

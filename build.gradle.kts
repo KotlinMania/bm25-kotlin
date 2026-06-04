@@ -582,7 +582,7 @@ dependencies {
     codeqlSourceClasspath("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.11.0")
     codeqlSourceClasspath("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.8.0")
     codeqlSourceClasspath("org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.4.0")
-    codeqlSourceClasspath("io.github.kotlinmania:unicode-segmentation-kotlin-jvm:0.1.0")
+    codeqlSourceClasspath("io.github.kotlinmania:unicode-segmentation-kotlin-jvm:0.1.1")
 }
 
 val codeqlCompileJvm = tasks.register<JavaExec>("codeqlCompileJvm") {

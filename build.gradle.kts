@@ -208,6 +208,7 @@ kotlin {
     compilerOptions {
         allWarningsAsErrors.set(true)
         freeCompilerArgs.add("-Xexpect-actual-classes")
+        freeCompilerArgs.add("-Xsuppress-version-warnings")
     }
 
     val xcf = XCFramework("Bm25")

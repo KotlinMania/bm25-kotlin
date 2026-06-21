@@ -10,7 +10,9 @@ private object WhitespaceTokenizer : Tokenizer {
         inputText.split(' ', '\t', '\n').filter { it.isNotEmpty() }
 }
 
-private data class MyType(val value: UInt)
+private data class MyType(
+    val value: UInt,
+)
 
 private object MyTypeEmbedder : TokenEmbedder<MyType> {
     override fun embed(token: String): MyType = MyType(42u)
@@ -24,9 +26,10 @@ private object SplitOnTTokenizer : Tokenizer {
 class EmbedderTest {
     @Test
     fun itWeightsUniqueWordsEqually() {
-        val embedder = EmbedderBuilder
-            .withAvgdl(UIntTokenEmbedder, WhitespaceTokenizer, 3.0f)
-            .build()
+        val embedder =
+            EmbedderBuilder
+                .withAvgdl(UIntTokenEmbedder, WhitespaceTokenizer, 3.0f)
+                .build()
         val embedding = embedder.embed("banana apple orange")
 
         assertTrue(embedding.size == 3)
@@ -35,9 +38,10 @@ class EmbedderTest {
 
     @Test
     fun itHandlesEmptyInput() {
-        val embedder = EmbedderBuilder
-            .withAvgdl(UIntTokenEmbedder, WhitespaceTokenizer, 1.0f)
-            .build()
+        val embedder =
+            EmbedderBuilder
+                .withAvgdl(UIntTokenEmbedder, WhitespaceTokenizer, 1.0f)
+                .build()
 
         val embedding = embedder.embed("")
 
@@ -46,9 +50,10 @@ class EmbedderTest {
 
     @Test
     fun itAllowsCustomisationOfEmbedder() {
-        val embedder = EmbedderBuilder
-            .withAvgdl(MyTypeEmbedder, WhitespaceTokenizer, 2.0f)
-            .build()
+        val embedder =
+            EmbedderBuilder
+                .withAvgdl(MyTypeEmbedder, WhitespaceTokenizer, 2.0f)
+                .build()
 
         val embedding = embedder.embed("space station")
 
@@ -60,9 +65,10 @@ class EmbedderTest {
 
     @Test
     fun itAllowsCustomisationOfTokenizer() {
-        val embedder = EmbedderBuilder
-            .withAvgdl(UIntTokenEmbedder, SplitOnTTokenizer, 1.0f)
-            .build()
+        val embedder =
+            EmbedderBuilder
+                .withAvgdl(UIntTokenEmbedder, SplitOnTTokenizer, 1.0f)
+                .build()
 
         val embedding = embedder.embed("CupTofTtea")
 

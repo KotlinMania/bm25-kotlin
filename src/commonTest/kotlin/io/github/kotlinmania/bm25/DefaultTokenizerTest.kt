@@ -59,11 +59,13 @@ class DefaultTokenizerTest {
     @Test
     fun itKeepsContractedWords() {
         val text = "can't you're won't let's couldn't've"
-        val tokenizer = DefaultTokenizer.builder()
-            .languageMode(Language.English)
-            .stemming(false)
-            .stopwords(false)
-            .build()
+        val tokenizer =
+            DefaultTokenizer
+                .builder()
+                .languageMode(Language.English)
+                .stemming(false)
+                .stopwords(false)
+                .build()
 
         val tokens = tokenizer.tokenize(text)
 
@@ -72,11 +74,12 @@ class DefaultTokenizerTest {
 
     @Test
     fun itRemovesPunctuation() {
-        val testCases = listOf(
-            "space, station!" to listOf("space", "station"),
-            "space,station" to listOf("space", "station"),
-            "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" to emptyList(),
-        )
+        val testCases =
+            listOf(
+                "space, station!" to listOf("space", "station"),
+                "space,station" to listOf("space", "station"),
+                "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" to emptyList(),
+            )
         val tokenizer = DefaultTokenizer.new(Language.English)
 
         for ((text, expected) in testCases) {
@@ -108,10 +111,12 @@ class DefaultTokenizerTest {
     @Test
     fun itConvertsUnicodeToAscii() {
         val text = "gem\u00fcse, Gie\u00dfen"
-        val tokenizer = DefaultTokenizer.builder()
-            .languageMode(Language.German)
-            .stemming(false)
-            .build()
+        val tokenizer =
+            DefaultTokenizer
+                .builder()
+                .languageMode(Language.German)
+                .stemming(false)
+                .build()
 
         val tokens = tokenizer.tokenize(text)
 
@@ -130,11 +135,13 @@ class DefaultTokenizerTest {
     @Test
     fun itDoesNotConvertUnicodeWhenNormalizationDisabled() {
         val text = "\u00e9tude"
-        val tokenizer = DefaultTokenizer.builder()
-            .languageMode(Language.French)
-            .normalization(false)
-            .stemming(false)
-            .build()
+        val tokenizer =
+            DefaultTokenizer
+                .builder()
+                .languageMode(Language.French)
+                .normalization(false)
+                .stemming(false)
+                .build()
 
         val tokens = tokenizer.tokenize(text)
 
@@ -144,10 +151,12 @@ class DefaultTokenizerTest {
     @Test
     fun itDoesNotRemoveStopwordsWhenStopwordsDisabled() {
         val text = "i my myself we you have"
-        val tokenizer = DefaultTokenizer.builder()
-            .languageMode(Language.English)
-            .stopwords(false)
-            .build()
+        val tokenizer =
+            DefaultTokenizer
+                .builder()
+                .languageMode(Language.English)
+                .stopwords(false)
+                .build()
 
         val tokens = tokenizer.tokenize(text)
 
@@ -157,10 +166,12 @@ class DefaultTokenizerTest {
     @Test
     fun itDoesNotStemWhenStemmingDisabled() {
         val text = "connection connections connective connect"
-        val tokenizer = DefaultTokenizer.builder()
-            .languageMode(Language.English)
-            .stemming(false)
-            .build()
+        val tokenizer =
+            DefaultTokenizer
+                .builder()
+                .languageMode(Language.English)
+                .stemming(false)
+                .build()
 
         val tokens = tokenizer.tokenize(text)
 

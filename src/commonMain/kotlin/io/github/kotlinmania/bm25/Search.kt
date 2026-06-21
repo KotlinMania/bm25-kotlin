@@ -68,9 +68,10 @@ class SearchEngine<K, S, T : Tokenizer> internal constructor(
     }
 
     /** Returns a sequence over the documents in the search engine. */
-    fun iter(): Sequence<Document<K>> = documents.asSequence().map { (id, contents) ->
-        Document(id, contents)
-    }
+    fun iter(): Sequence<Document<K>> =
+        documents.asSequence().map { (id, contents) ->
+            Document(id, contents)
+        }
 
     /**
      * Searches the documents for the given query and returns the top `limit` results. Only the
@@ -107,32 +108,37 @@ class SearchEngineBuilder<K, S, T : Tokenizer> private constructor(
     private val documents: MutableList<Document<K>>,
 ) {
     /** Sets the tokenizer of the embedder. */
-    fun tokenizer(tokenizer: T): SearchEngineBuilder<K, S, T> = also {
-        it.embedderBuilder = it.embedderBuilder.tokenizer(tokenizer)
-    }
+    fun tokenizer(tokenizer: T): SearchEngineBuilder<K, S, T> =
+        also {
+            it.embedderBuilder = it.embedderBuilder.tokenizer(tokenizer)
+        }
 
     /** Sets the k1 parameter of the embedder. */
-    fun k1(k1: Float): SearchEngineBuilder<K, S, T> = also {
-        it.embedderBuilder = it.embedderBuilder.k1(k1)
-    }
+    fun k1(k1: Float): SearchEngineBuilder<K, S, T> =
+        also {
+            it.embedderBuilder = it.embedderBuilder.k1(k1)
+        }
 
     /** Sets the b parameter of the embedder. */
-    fun b(b: Float): SearchEngineBuilder<K, S, T> = also {
-        it.embedderBuilder = it.embedderBuilder.b(b)
-    }
+    fun b(b: Float): SearchEngineBuilder<K, S, T> =
+        also {
+            it.embedderBuilder = it.embedderBuilder.b(b)
+        }
 
     /** Overrides the average document length of the embedder. */
-    fun avgdl(avgdl: Float): SearchEngineBuilder<K, S, T> = also {
-        it.embedderBuilder = it.embedderBuilder.avgdl(avgdl)
-    }
+    fun avgdl(avgdl: Float): SearchEngineBuilder<K, S, T> =
+        also {
+            it.embedderBuilder = it.embedderBuilder.avgdl(avgdl)
+        }
 
     /** Builds the search engine. */
     fun build(): SearchEngine<K, S, T> {
-        val searchEngine = SearchEngine(
-            embedder = embedderBuilder.build(),
-            scorer = Scorer<K, S>(),
-            documents = HashMap(),
-        )
+        val searchEngine =
+            SearchEngine(
+                embedder = embedderBuilder.build(),
+                scorer = Scorer<K, S>(),
+                documents = HashMap(),
+            )
         for (document in documents) {
             searchEngine.upsert(document)
         }
@@ -174,10 +180,11 @@ class SearchEngineBuilder<K, S, T : Tokenizer> private constructor(
             tokenEmbedder: TokenEmbedder<S>,
             tokenizer: T,
             avgdl: Float,
-        ): SearchEngineBuilder<K, S, T> = SearchEngineBuilder(
-            embedderBuilder = EmbedderBuilder.withAvgdl(tokenEmbedder, tokenizer, avgdl),
-            documents = ArrayList(),
-        )
+        ): SearchEngineBuilder<K, S, T> =
+            SearchEngineBuilder(
+                embedderBuilder = EmbedderBuilder.withAvgdl(tokenEmbedder, tokenizer, avgdl),
+                documents = ArrayList(),
+            )
 
         /**
          * Constructs a new SearchEngineBuilder with the given documents. The search engine will
@@ -192,11 +199,12 @@ class SearchEngineBuilder<K, S, T : Tokenizer> private constructor(
         ): SearchEngineBuilder<K, S, T> {
             val docs = documents.toMutableList()
             return SearchEngineBuilder(
-                embedderBuilder = EmbedderBuilder.withTokenizerAndFitToCorpus(
-                    tokenEmbedder,
-                    tokenizer,
-                    docs.map { it.contents },
-                ),
+                embedderBuilder =
+                    EmbedderBuilder.withTokenizerAndFitToCorpus(
+                        tokenEmbedder,
+                        tokenizer,
+                        docs.map { it.contents },
+                    ),
                 documents = docs,
             )
         }
@@ -212,9 +220,10 @@ class SearchEngineBuilder<K, S, T : Tokenizer> private constructor(
             tokenizer: T,
             corpus: Iterable<String>,
         ): SearchEngineBuilder<UInt, S, T> {
-            val documents = corpus.withIndex().map { (id, document) ->
-                Document(id.toUInt(), document)
-            }
+            val documents =
+                corpus.withIndex().map { (id, document) ->
+                    Document(id.toUInt(), document)
+                }
             return withTokenizerAndDocuments(tokenEmbedder, tokenizer, documents)
         }
 

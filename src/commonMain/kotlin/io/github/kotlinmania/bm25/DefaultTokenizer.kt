@@ -32,68 +32,73 @@ sealed class LanguageMode {
     data object Detect : LanguageMode()
 
     /** Use a fixed language. */
-    data class Fixed(val language: Language) : LanguageMode()
+    data class Fixed(
+        val language: Language,
+    ) : LanguageMode()
 
     companion object {
         fun default(): LanguageMode = Fixed(Language.English)
+
         fun from(language: Language): LanguageMode = Fixed(language)
     }
 }
 
-private fun normalizeText(text: String): String = buildString(text.length) {
-    for (char in text) {
-        append(
-            when (char) {
-                '\u00e4', '\u00e1', '\u00e0', '\u00e2', '\u00e3', '\u00e5', '\u0101' -> "a"
-                '\u00c4', '\u00c1', '\u00c0', '\u00c2', '\u00c3', '\u00c5', '\u0100' -> "A"
-                '\u00e6' -> "ae"
-                '\u00c6' -> "AE"
-                '\u00e7', '\u0107', '\u010d' -> "c"
-                '\u00c7', '\u0106', '\u010c' -> "C"
-                '\u00e9', '\u00e8', '\u00ea', '\u00eb', '\u0113' -> "e"
-                '\u00c9', '\u00c8', '\u00ca', '\u00cb', '\u0112' -> "E"
-                '\u00ed', '\u00ec', '\u00ee', '\u00ef', '\u012b' -> "i"
-                '\u00cd', '\u00cc', '\u00ce', '\u00cf', '\u012a' -> "I"
-                '\u00f1' -> "n"
-                '\u00d1' -> "N"
-                '\u00f6', '\u00f3', '\u00f2', '\u00f4', '\u00f5', '\u014d' -> "o"
-                '\u00d6', '\u00d3', '\u00d2', '\u00d4', '\u00d5', '\u014c' -> "O"
-                '\u00f8' -> "o"
-                '\u00d8' -> "O"
-                '\u00df' -> "ss"
-                '\u00fc', '\u00fa', '\u00f9', '\u00fb', '\u016b' -> "u"
-                '\u00dc', '\u00da', '\u00d9', '\u00db', '\u016a' -> "U"
-                '\u00fd', '\u00ff' -> "y"
-                '\u00dd' -> "Y"
-                '\ud83c' -> ""
-                '\udf55' -> "pizza"
-                '\ud83d' -> ""
-                '\ude80' -> "rocket"
-                '\udf4b' -> "lemon"
-                else -> {
-                    if (char.code <= 0x7f) {
-                        char.toString()
-                    } else {
-                        "[?]"
+private fun normalizeText(text: String): String =
+    buildString(text.length) {
+        for (char in text) {
+            append(
+                when (char) {
+                    '\u00e4', '\u00e1', '\u00e0', '\u00e2', '\u00e3', '\u00e5', '\u0101' -> "a"
+                    '\u00c4', '\u00c1', '\u00c0', '\u00c2', '\u00c3', '\u00c5', '\u0100' -> "A"
+                    '\u00e6' -> "ae"
+                    '\u00c6' -> "AE"
+                    '\u00e7', '\u0107', '\u010d' -> "c"
+                    '\u00c7', '\u0106', '\u010c' -> "C"
+                    '\u00e9', '\u00e8', '\u00ea', '\u00eb', '\u0113' -> "e"
+                    '\u00c9', '\u00c8', '\u00ca', '\u00cb', '\u0112' -> "E"
+                    '\u00ed', '\u00ec', '\u00ee', '\u00ef', '\u012b' -> "i"
+                    '\u00cd', '\u00cc', '\u00ce', '\u00cf', '\u012a' -> "I"
+                    '\u00f1' -> "n"
+                    '\u00d1' -> "N"
+                    '\u00f6', '\u00f3', '\u00f2', '\u00f4', '\u00f5', '\u014d' -> "o"
+                    '\u00d6', '\u00d3', '\u00d2', '\u00d4', '\u00d5', '\u014c' -> "O"
+                    '\u00f8' -> "o"
+                    '\u00d8' -> "O"
+                    '\u00df' -> "ss"
+                    '\u00fc', '\u00fa', '\u00f9', '\u00fb', '\u016b' -> "u"
+                    '\u00dc', '\u00da', '\u00d9', '\u00db', '\u016a' -> "U"
+                    '\u00fd', '\u00ff' -> "y"
+                    '\u00dd' -> "Y"
+                    '\ud83c' -> ""
+                    '\udf55' -> "pizza"
+                    '\ud83d' -> ""
+                    '\ude80' -> "rocket"
+                    '\udf4b' -> "lemon"
+                    else -> {
+                        if (char.code <= 0x7f) {
+                            char.toString()
+                        } else {
+                            "[?]"
+                        }
                     }
-                }
-            },
-        )
+                },
+            )
+        }
     }
-}
 
 private val stopwordCache: MutableMap<Pair<Language, Boolean>, Set<String>> = HashMap()
 
 private fun getStopwords(language: Language, normalized: Boolean): Set<String> {
     val key = language to normalized
     return stopwordCache.getOrPut(key) {
-        val words = when (language) {
-            Language.English -> englishStopwords
-            Language.German -> germanStopwords
-            Language.French -> frenchStopwords
-            Language.Spanish -> spanishStopwords
-            else -> emptySet()
-        }
+        val words =
+            when (language) {
+                Language.English -> englishStopwords
+                Language.German -> germanStopwords
+                Language.French -> frenchStopwords
+                Language.Spanish -> spanishStopwords
+                else -> emptySet()
+            }
         if (normalized) {
             words.mapTo(HashSet()) { normalizeText(it) }
         } else {
@@ -151,10 +156,11 @@ private class Components(
     val settings: Settings,
     private val language: Language?,
 ) {
-    private val stopwords: Set<String> = when {
-        language != null && settings.stopwords -> getStopwords(language, settings.normalization)
-        else -> emptySet()
-    }
+    private val stopwords: Set<String> =
+        when {
+            language != null && settings.stopwords -> getStopwords(language, settings.normalization)
+            else -> emptySet()
+        }
 
     fun normalize(text: String): String =
         if (settings.normalization) normalizeText(text) else text
@@ -166,18 +172,24 @@ private class Components(
 }
 
 private sealed class Resources {
-    data class Static(val components: Components) : Resources()
-    data class Dynamic(val settings: Settings) : Resources()
+    data class Static(
+        val components: Components,
+    ) : Resources()
+
+    data class Dynamic(
+        val settings: Settings,
+    ) : Resources()
 }
 
 class DefaultTokenizer private constructor(
     private val resources: Resources,
 ) : Tokenizer {
     override fun toString(): String {
-        val settings = when (val resources = resources) {
-            is Resources.Static -> resources.components.settings
-            is Resources.Dynamic -> resources.settings
-        }
+        val settings =
+            when (val resources = resources) {
+                is Resources.Static -> resources.components.settings
+                is Resources.Dynamic -> resources.settings
+            }
         return "DefaultTokenizer($settings)"
     }
 
@@ -223,10 +235,11 @@ class DefaultTokenizer private constructor(
             stopwords: Boolean,
         ): DefaultTokenizer {
             val settings = Settings(stemming, stopwords, normalization)
-            val resources = when (languageMode) {
-                LanguageMode.Detect -> Resources.Dynamic(settings)
-                is LanguageMode.Fixed -> Resources.Static(Components(settings, languageMode.language))
-            }
+            val resources =
+                when (languageMode) {
+                    LanguageMode.Detect -> Resources.Dynamic(settings)
+                    is LanguageMode.Fixed -> Resources.Static(Components(settings, languageMode.language))
+                }
             return DefaultTokenizer(resources)
         }
 
@@ -292,187 +305,192 @@ class DefaultTokenizerBuilder private constructor(
         DefaultTokenizer.create(languageMode, normalization, stemming, stopwords)
 
     companion object {
-        fun new(): DefaultTokenizerBuilder = DefaultTokenizerBuilder(
-            languageMode = LanguageMode.default(),
-            normalization = true,
-            stemming = true,
-            stopwords = true,
-        )
+        fun new(): DefaultTokenizerBuilder =
+            DefaultTokenizerBuilder(
+                languageMode = LanguageMode.default(),
+                normalization = true,
+                stemming = true,
+                stopwords = true,
+            )
     }
 }
 
-private val englishStopwords = setOf(
-    "a",
-    "an",
-    "and",
-    "are",
-    "as",
-    "at",
-    "be",
-    "been",
-    "by",
-    "for",
-    "from",
-    "had",
-    "has",
-    "have",
-    "he",
-    "her",
-    "hers",
-    "him",
-    "his",
-    "i",
-    "is",
-    "it",
-    "its",
-    "me",
-    "my",
-    "myself",
-    "of",
-    "on",
-    "or",
-    "our",
-    "ours",
-    "ourselves",
-    "she",
-    "that",
-    "the",
-    "their",
-    "them",
-    "they",
-    "this",
-    "to",
-    "was",
-    "we",
-    "were",
-    "with",
-    "you",
-    "you're",
-    "you've",
-    "you'll",
-    "you'd",
-    "your",
-    "yours",
-)
+private val englishStopwords =
+    setOf(
+        "a",
+        "an",
+        "and",
+        "are",
+        "as",
+        "at",
+        "be",
+        "been",
+        "by",
+        "for",
+        "from",
+        "had",
+        "has",
+        "have",
+        "he",
+        "her",
+        "hers",
+        "him",
+        "his",
+        "i",
+        "is",
+        "it",
+        "its",
+        "me",
+        "my",
+        "myself",
+        "of",
+        "on",
+        "or",
+        "our",
+        "ours",
+        "ourselves",
+        "she",
+        "that",
+        "the",
+        "their",
+        "them",
+        "they",
+        "this",
+        "to",
+        "was",
+        "we",
+        "were",
+        "with",
+        "you",
+        "you're",
+        "you've",
+        "you'll",
+        "you'd",
+        "your",
+        "yours",
+    )
 
-private val germanStopwords = setOf(
-    "aber",
-    "als",
-    "am",
-    "an",
-    "auch",
-    "auf",
-    "aus",
-    "bei",
-    "das",
-    "dem",
-    "den",
-    "der",
-    "des",
-    "die",
-    "ein",
-    "eine",
-    "einem",
-    "einen",
-    "einer",
-    "es",
-    "fur",
-    "im",
-    "in",
-    "ist",
-    "mit",
-    "und",
-    "von",
-    "zu",
-)
+private val germanStopwords =
+    setOf(
+        "aber",
+        "als",
+        "am",
+        "an",
+        "auch",
+        "auf",
+        "aus",
+        "bei",
+        "das",
+        "dem",
+        "den",
+        "der",
+        "des",
+        "die",
+        "ein",
+        "eine",
+        "einem",
+        "einen",
+        "einer",
+        "es",
+        "fur",
+        "im",
+        "in",
+        "ist",
+        "mit",
+        "und",
+        "von",
+        "zu",
+    )
 
-private val frenchStopwords = setOf(
-    "au",
-    "aux",
-    "avec",
-    "ce",
-    "ces",
-    "dans",
-    "de",
-    "des",
-    "du",
-    "elle",
-    "en",
-    "et",
-    "eux",
-    "il",
-    "je",
-    "la",
-    "le",
-    "les",
-    "leur",
-    "lui",
-    "ma",
-    "mais",
-    "me",
-    "meme",
-    "mes",
-    "moi",
-    "mon",
-    "ne",
-    "nos",
-    "notre",
-    "nous",
-    "ou",
-    "par",
-    "pas",
-    "pour",
-    "qu",
-    "que",
-    "qui",
-    "sa",
-    "se",
-    "ses",
-    "son",
-    "sur",
-    "ta",
-    "te",
-    "tes",
-    "toi",
-    "ton",
-    "tu",
-    "un",
-    "une",
-    "vos",
-    "votre",
-    "vous",
-)
+private val frenchStopwords =
+    setOf(
+        "au",
+        "aux",
+        "avec",
+        "ce",
+        "ces",
+        "dans",
+        "de",
+        "des",
+        "du",
+        "elle",
+        "en",
+        "et",
+        "eux",
+        "il",
+        "je",
+        "la",
+        "le",
+        "les",
+        "leur",
+        "lui",
+        "ma",
+        "mais",
+        "me",
+        "meme",
+        "mes",
+        "moi",
+        "mon",
+        "ne",
+        "nos",
+        "notre",
+        "nous",
+        "ou",
+        "par",
+        "pas",
+        "pour",
+        "qu",
+        "que",
+        "qui",
+        "sa",
+        "se",
+        "ses",
+        "son",
+        "sur",
+        "ta",
+        "te",
+        "tes",
+        "toi",
+        "ton",
+        "tu",
+        "un",
+        "une",
+        "vos",
+        "votre",
+        "vous",
+    )
 
-private val spanishStopwords = setOf(
-    "a",
-    "al",
-    "algo",
-    "como",
-    "con",
-    "de",
-    "del",
-    "el",
-    "ella",
-    "en",
-    "es",
-    "esta",
-    "este",
-    "la",
-    "las",
-    "lo",
-    "los",
-    "mas",
-    "me",
-    "mi",
-    "no",
-    "para",
-    "pero",
-    "por",
-    "que",
-    "se",
-    "si",
-    "su",
-    "un",
-    "una",
-    "y",
-)
+private val spanishStopwords =
+    setOf(
+        "a",
+        "al",
+        "algo",
+        "como",
+        "con",
+        "de",
+        "del",
+        "el",
+        "ella",
+        "en",
+        "es",
+        "esta",
+        "este",
+        "la",
+        "las",
+        "lo",
+        "los",
+        "mas",
+        "me",
+        "mi",
+        "no",
+        "para",
+        "pero",
+        "por",
+        "que",
+        "se",
+        "si",
+        "su",
+        "un",
+        "una",
+        "y",
+    )

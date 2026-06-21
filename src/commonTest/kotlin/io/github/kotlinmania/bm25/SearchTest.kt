@@ -14,9 +14,10 @@ private object SearchWhitespaceTokenizer : Tokenizer {
 class SearchTest {
     @Test
     fun itCanInsertADocument() {
-        val searchEngine = SearchEngineBuilder
-            .withAvgdl<String, UInt, Tokenizer>(UIntTokenEmbedder, SearchWhitespaceTokenizer, 2.0f)
-            .build()
+        val searchEngine =
+            SearchEngineBuilder
+                .withAvgdl<String, UInt, Tokenizer>(UIntTokenEmbedder, SearchWhitespaceTokenizer, 2.0f)
+                .build()
         val document = Document(id = "hello world", contents = "bananas and apples")
         val documentId = document.id
 
@@ -28,9 +29,10 @@ class SearchTest {
 
     @Test
     fun itCanRemoveADocument() {
-        val searchEngine = SearchEngineBuilder
-            .withAvgdl<Int, UInt, Tokenizer>(UIntTokenEmbedder, SearchWhitespaceTokenizer, 2.0f)
-            .build()
+        val searchEngine =
+            SearchEngineBuilder
+                .withAvgdl<Int, UInt, Tokenizer>(UIntTokenEmbedder, SearchWhitespaceTokenizer, 2.0f)
+                .build()
         val document = Document(id = 123, contents = "bananas and apples")
         val documentId = document.id
 
@@ -42,9 +44,10 @@ class SearchTest {
 
     @Test
     fun handlesEmptyInput() {
-        val searchEngine = SearchEngineBuilder
-            .withAvgdl<UInt, UInt, Tokenizer>(UIntTokenEmbedder, SearchWhitespaceTokenizer, 2.0f)
-            .build()
+        val searchEngine =
+            SearchEngineBuilder
+                .withAvgdl<UInt, UInt, Tokenizer>(UIntTokenEmbedder, SearchWhitespaceTokenizer, 2.0f)
+                .build()
         val document = Document(id = 123u, contents = "")
 
         searchEngine.upsert(document)
@@ -55,9 +58,10 @@ class SearchTest {
 
     @Test
     fun handlesEmptySearch() {
-        val searchEngine = SearchEngineBuilder
-            .withAvgdl<UInt, UInt, Tokenizer>(UIntTokenEmbedder, SearchWhitespaceTokenizer, 2.0f)
-            .build()
+        val searchEngine =
+            SearchEngineBuilder
+                .withAvgdl<UInt, UInt, Tokenizer>(UIntTokenEmbedder, SearchWhitespaceTokenizer, 2.0f)
+                .build()
         val document = Document(id = 123u, contents = "pencil and paper")
 
         searchEngine.upsert(document)

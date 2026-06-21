@@ -20,7 +20,6 @@ data class TokenEmbedding<D>(
 class Embedding<D>(
     val tokens: List<TokenEmbedding<D>>,
 ) : List<TokenEmbedding<D>> by tokens {
-
     constructor(vararg tokens: TokenEmbedding<D>) : this(tokens.toList())
 
     /** Returns a sequence over the indices of the embedding. */
@@ -75,13 +74,15 @@ class Embedder<S, T : Tokenizer> internal constructor(
             counts[token] = (counts[token] ?: 0) + 1
         }
 
-        val values = indices.map { i ->
-            val tokenFrequency = (counts[i] ?: 0).toFloat()
-            val numerator = tokenFrequency * (k1 + 1.0f)
-            val denominator = tokenFrequency +
-                k1 * (1.0f - b + b * (tokens.size.toFloat() / avgdl))
-            numerator / denominator
-        }
+        val values =
+            indices.map { i ->
+                val tokenFrequency = (counts[i] ?: 0).toFloat()
+                val numerator = tokenFrequency * (k1 + 1.0f)
+                val denominator =
+                    tokenFrequency +
+                        k1 * (1.0f - b + b * (tokens.size.toFloat() / avgdl))
+                numerator / denominator
+            }
 
         val embedded = ArrayList<TokenEmbedding<S>>(indices.size)
         for (i in indices.indices) {
@@ -116,13 +117,14 @@ class EmbedderBuilder<S, T : Tokenizer> private constructor(
     fun tokenizer(tokenizer: T): EmbedderBuilder<S, T> = also { it.tokenizer = tokenizer }
 
     /** Builds the [Embedder]. */
-    fun build(): Embedder<S, T> = Embedder(
-        tokenizer = tokenizer,
-        tokenEmbedder = tokenEmbedder,
-        k1 = k1,
-        b = b,
-        avgdlValue = avgdl,
-    )
+    fun build(): Embedder<S, T> =
+        Embedder(
+            tokenizer = tokenizer,
+            tokenEmbedder = tokenEmbedder,
+            k1 = k1,
+            b = b,
+            avgdlValue = avgdl,
+        )
 
     companion object {
         /**
@@ -158,13 +160,14 @@ class EmbedderBuilder<S, T : Tokenizer> private constructor(
             tokenEmbedder: TokenEmbedder<S>,
             tokenizer: T,
             avgdl: Float,
-        ): EmbedderBuilder<S, T> = EmbedderBuilder(
-            tokenEmbedder = tokenEmbedder,
-            tokenizer = tokenizer,
-            k1 = 1.2f,
-            b = 0.75f,
-            avgdl = avgdl,
-        )
+        ): EmbedderBuilder<S, T> =
+            EmbedderBuilder(
+                tokenEmbedder = tokenEmbedder,
+                tokenizer = tokenizer,
+                k1 = 1.2f,
+                b = 0.75f,
+                avgdl = avgdl,
+            )
 
         /**
          * Constructs a new EmbedderBuilder with its average document length fit to the given
@@ -176,15 +179,16 @@ class EmbedderBuilder<S, T : Tokenizer> private constructor(
             tokenizer: T,
             corpus: List<String>,
         ): EmbedderBuilder<S, T> {
-            val avgdl = if (corpus.isEmpty()) {
-                Embedder.FALLBACK_AVGDL
-            } else {
-                var totalLen: Long = 0
-                for (doc in corpus) {
-                    totalLen += tokenizer.tokenize(doc).size.toLong()
+            val avgdl =
+                if (corpus.isEmpty()) {
+                    Embedder.FALLBACK_AVGDL
+                } else {
+                    var totalLen: Long = 0
+                    for (doc in corpus) {
+                        totalLen += tokenizer.tokenize(doc).size.toLong()
+                    }
+                    (totalLen.toDouble() / corpus.size.toDouble()).toFloat()
                 }
-                (totalLen.toDouble() / corpus.size.toDouble()).toFloat()
-            }
             return EmbedderBuilder(
                 tokenEmbedder = tokenEmbedder,
                 tokenizer = tokenizer,

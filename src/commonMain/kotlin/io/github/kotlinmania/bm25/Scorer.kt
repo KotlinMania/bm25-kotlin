@@ -77,8 +77,11 @@ class Scorer<K, D> {
         }
 
         scores.sortWith { a, b ->
-            if (a.score.isNaN() || b.score.isNaN()) 0
-            else b.score.compareTo(a.score)
+            if (a.score.isNaN() || b.score.isNaN()) {
+                0
+            } else {
+                b.score.compareTo(a.score)
+            }
         }
         return scores
     }
@@ -98,10 +101,11 @@ class Scorer<K, D> {
 
         for (tokenIndex in queryEmbedding.indices()) {
             val tokenIdf = idf(tokenIndex)
-            val tokenIndexValue = documentEmbedding
-                .firstOrNull { it.index == tokenIndex }
-                ?.value
-                ?: 0.0f
+            val tokenIndexValue =
+                documentEmbedding
+                    .firstOrNull { it.index == tokenIndex }
+                    ?.value
+                    ?: 0.0f
             val tokenScore = tokenIdf * tokenIndexValue
             documentScore += tokenScore
         }

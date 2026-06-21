@@ -59,11 +59,12 @@ class ScorerTest {
     @Test
     fun itScoresRareIndicesHigherThanCommonOnes() {
         // BM25 should score rare token matches higher than common token matches.
-        val documentEmbeddings = listOf(
-            Embedding(TokenEmbedding(0u, 1.0f)),
-            Embedding(TokenEmbedding(0u, 1.0f)),
-            Embedding(TokenEmbedding(1u, 1.0f)),
-        )
+        val documentEmbeddings =
+            listOf(
+                Embedding(TokenEmbedding(0u, 1.0f)),
+                Embedding(TokenEmbedding(0u, 1.0f)),
+                Embedding(TokenEmbedding(1u, 1.0f)),
+            )
         val scorer = scorerWithEmbeddings(documentEmbeddings)
 
         val score1 = scorer.score(0, Embedding(TokenEmbedding(0u, 1.0f)))
@@ -74,14 +75,15 @@ class ScorerTest {
 
     @Test
     fun itScoresLongerEmbeddingsLowerThanShorterOnes() {
-        val documentEmbeddings = listOf(
-            // Longer embeddings will have a lower value for unique tokens.
-            Embedding(
-                TokenEmbedding(0u, 0.9f),
-                TokenEmbedding(1u, 0.9f),
-            ),
-            Embedding(TokenEmbedding(0u, 1.0f)),
-        )
+        val documentEmbeddings =
+            listOf(
+                // Longer embeddings will have a lower value for unique tokens.
+                Embedding(
+                    TokenEmbedding(0u, 0.9f),
+                    TokenEmbedding(1u, 0.9f),
+                ),
+                Embedding(TokenEmbedding(0u, 1.0f)),
+            )
         val scorer = scorerWithEmbeddings(documentEmbeddings)
 
         val score1 = scorer.score(0, Embedding(TokenEmbedding(0u, 1.0f)))
@@ -92,10 +94,11 @@ class ScorerTest {
 
     @Test
     fun itOnlyMatchesEmbeddingsWithNonZeroScore() {
-        val documentEmbeddings = listOf(
-            Embedding(TokenEmbedding(0u, 1.0f)),
-            Embedding(TokenEmbedding(1u, 1.0f)),
-        )
+        val documentEmbeddings =
+            listOf(
+                Embedding(TokenEmbedding(0u, 1.0f)),
+                Embedding(TokenEmbedding(1u, 1.0f)),
+            )
         val scorer = scorerWithEmbeddings(documentEmbeddings)
 
         val queryEmbedding = Embedding(TokenEmbedding(0u, 1.0f))
@@ -114,12 +117,13 @@ class ScorerTest {
         // instances where the occurrences exceeded the number of documents, the IDF (and
         // therefore the score) would be negative.
         // See this bug report for more information: https://github.com/Michael-JB/bm25/pull/20
-        val documentEmbeddings = listOf(
-            Embedding(
-                TokenEmbedding(0u, 1.5f),
-                TokenEmbedding(0u, 1.5f),
-            ),
-        )
+        val documentEmbeddings =
+            listOf(
+                Embedding(
+                    TokenEmbedding(0u, 1.5f),
+                    TokenEmbedding(0u, 1.5f),
+                ),
+            )
         val scorer = scorerWithEmbeddings(documentEmbeddings)
         val queryEmbedding = Embedding(TokenEmbedding(0u, 1.0f))
 
@@ -130,13 +134,14 @@ class ScorerTest {
 
     @Test
     fun itSortsMatchesByScore() {
-        val documentEmbeddings = listOf(
-            Embedding(
-                TokenEmbedding(0u, 0.9f),
-                TokenEmbedding(1u, 0.9f),
-            ),
-            Embedding(TokenEmbedding(0u, 1.0f)),
-        )
+        val documentEmbeddings =
+            listOf(
+                Embedding(
+                    TokenEmbedding(0u, 0.9f),
+                    TokenEmbedding(1u, 0.9f),
+                ),
+                Embedding(TokenEmbedding(0u, 1.0f)),
+            )
         val scorer = scorerWithEmbeddings(documentEmbeddings)
 
         val queryEmbedding = Embedding(TokenEmbedding(0u, 1.0f))

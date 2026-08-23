@@ -1,4 +1,4 @@
-// port-lint: source src/default_tokenizer.rs
+// port-lint: source default_tokenizer.rs
 package io.github.kotlinmania.bm25
 
 import kotlin.test.Test

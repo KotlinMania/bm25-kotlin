@@ -1,4 +1,4 @@
-// port-lint: source src/scorer.rs
+// port-lint: source scorer.rs
 package io.github.kotlinmania.bm25
 
 import kotlin.math.abs

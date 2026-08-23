@@ -1,18 +1,21 @@
-// port-lint: source src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.bm25
 
-// Upstream `src/lib.rs` is a re-export hub. Top-level items in this Kotlin package are visible
-// to consumers without aliasing, so this file holds only the upstream module-level docs and a
-// tracking ledger of upstream `pub use` lines. New caller migrations append to the ledger.
+// Tracking file for upstream lib.rs.
 //
-// pub use embedder::{
-//     DefaultTokenizer, Embedder, EmbedderBuilder, Embedding, TokenEmbedder, TokenEmbedding,
-// };
-// pub use scorer::{ScoredDocument, Scorer};
-// pub use search::{Document, SearchEngine, SearchEngineBuilder, SearchResult};
-// pub use tokenizer::Tokenizer;
+// Upstream module declarations:
+//   Module defaultTokenizer is included when defaultTokenizer feature is enabled.
+//   Module embedder is included.
+//   Module scorer is included.
+//   Module search is included.
+//   Module tokenizer is included.
 //
-// #[cfg(feature = "default_tokenizer")]
-// pub use default_tokenizer::{Language, LanguageMode};
+// Upstream re-exports:
+//   Re-exports DefaultTokenizer, Embedder, EmbedderBuilder, Embedding, TokenEmbedder, TokenEmbedding
+//   Re-exports ScoredDocument, Scorer
+//   Re-exports Document, SearchEngine, SearchEngineBuilder, SearchResult
+//   Re-exports Tokenizer
+//   When defaultTokenizer feature is enabled: re-exports Language, LanguageMode
 //
 // Callers migrated:
+// (none)

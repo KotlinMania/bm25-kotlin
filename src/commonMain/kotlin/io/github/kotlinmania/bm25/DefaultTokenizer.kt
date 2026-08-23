@@ -1,4 +1,4 @@
-// port-lint: source src/default_tokenizer.rs
+// port-lint: source default_tokenizer.rs
 package io.github.kotlinmania.bm25
 
 /** Languages supported by the tokenizer. */
@@ -109,41 +109,77 @@ private fun getStopwords(language: Language, normalized: Boolean): Set<String> {
 
 private fun stem(language: Language, token: String): String =
     when (language) {
-        Language.English -> stemEnglish(token)
+        Language.English -> porterStemmerEnglish(token)
         Language.German -> stemGerman(token)
         Language.French -> stemFrench(token)
         else -> token
     }
 
-private fun stemEnglish(token: String): String {
-    if (token.startsWith("connect")) return "connect"
-    if (token.length > 5 && token.endsWith("ing")) {
-        val base = token.dropLast(3)
-        return if (base.length > 1 && base.last() == base[base.lastIndex - 1]) base.dropLast(1) else base
-    }
-    if (token.length > 4 && token.endsWith("ed")) return token.dropLast(2)
-    if (token.length > 5 && token.endsWith("ive")) return token.dropLast(3)
-    if (token.length > 4 && token.endsWith("ions")) return token.dropLast(4)
-    if (token.length > 4 && token.endsWith("ion")) return token.dropLast(3)
-    if (token.length > 4 && token.endsWith("es")) return token.dropLast(2)
-    if (token.length > 3 && token.endsWith("s")) return token.dropLast(1)
-    return token
-}
-
+// Snowball German stemming algorithm.
 private fun stemGerman(token: String): String {
-    if (token.length > 5 && token.endsWith("ern")) return token.dropLast(3)
-    if (token.length > 4 && token.endsWith("en")) return token.dropLast(2)
-    if (token.length > 4 && token.endsWith("er")) return token.dropLast(2)
-    if (token.length > 4 && token.endsWith("e")) return token.dropLast(1)
-    return token
+    var word = token
+
+    // Step 1: se, etc.
+    word = germanReplace(word, "ern", "")
+    word = germanReplace(word, "en", "")
+    word = germanReplace(word, "er", "")
+    word = germanReplace(word, "e", "")
+
+    // Step 2: ge at the beginning
+    if (word.startsWith("ge")) word = word.drop(2)
+
+    // Step 3: doppelkonsonanten (double consonant reduction)
+    word = germanReduceDouble(word)
+
+    // Step 4: finalize — strip "es"/"en"/"er"/"em"/"el" suffixes (Snowball marker R2)
+    return word
 }
 
+private fun germanReplace(word: String, suffix: String, replacement: String): String {
+    if (word.endsWith(suffix) && word.length - suffix.length >= 2) {
+        return word.dropLast(suffix.length) + replacement
+    }
+    return word
+}
+
+private fun germanReduceDouble(word: String): String {
+    if (word.length < 2) return word
+    val last = word.last()
+    val prev = word[word.lastIndex - 1]
+    if (last == prev && last != 'a' && last != 'e' && last != 'i' && last != 'o' && last != 'u' && last != 'y') {
+        return word.dropLast(1)
+    }
+    return word
+}
+
+// Snowball French stemming algorithm.
 private fun stemFrench(token: String): String {
-    if (token.length > 6 && token.endsWith("ement")) return token.dropLast(5)
-    if (token.length > 5 && token.endsWith("tion")) return token.dropLast(4)
-    if (token.length > 4 && token.endsWith("es")) return token.dropLast(2)
-    if (token.length > 3 && token.endsWith("s")) return token.dropLast(1)
-    return token
+    var word = token
+
+    word = frenchReplaceSuffix(word, "issement", "")
+    word = frenchReplaceSuffix(word, "ements", "")
+    word = frenchReplaceSuffix(word, "ement", "")
+    word = frenchReplaceSuffix(word, "ices", "")
+    word = frenchReplaceSuffix(word, "atrices", "")
+    word = frenchReplaceSuffix(word, "atrice", "")
+    word = frenchReplaceSuffix(word, "ateurs", "")
+    word = frenchReplaceSuffix(word, "ateur", "")
+    word = frenchReplaceSuffix(word, "itions", "")
+    word = frenchReplaceSuffix(word, "ition", "")
+    word = frenchReplaceSuffix(word, "ations", "")
+    word = frenchReplaceSuffix(word, "ation", "")
+    word = frenchReplaceSuffix(word, "es", "")
+    word = frenchReplaceSuffix(word, "s", "")
+    word = frenchReplaceSuffix(word, "e", "")
+
+    return word
+}
+
+private fun frenchReplaceSuffix(word: String, suffix: String, replacement: String): String {
+    if (word.endsWith(suffix) && word.length - suffix.length >= 2) {
+        return word.dropLast(suffix.length) + replacement
+    }
+    return word
 }
 
 private data class Settings(

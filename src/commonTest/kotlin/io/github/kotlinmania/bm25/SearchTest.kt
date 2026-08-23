@@ -1,4 +1,4 @@
-// port-lint: source src/search.rs
+// port-lint: source search.rs
 package io.github.kotlinmania.bm25
 
 import kotlin.test.Test

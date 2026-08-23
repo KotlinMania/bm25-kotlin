@@ -1,4 +1,4 @@
-// port-lint: source src/embedder.rs
+// port-lint: source embedder.rs
 package io.github.kotlinmania.bm25
 
 import kotlin.test.Test

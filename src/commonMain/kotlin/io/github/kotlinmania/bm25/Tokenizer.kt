@@ -1,4 +1,4 @@
-// port-lint: source src/tokenizer.rs
+// port-lint: source tokenizer.rs
 package io.github.kotlinmania.bm25
 
 /**

@@ -1,6 +1,8 @@
 // port-lint: source default_tokenizer.rs
 package io.github.kotlinmania.bm25
 
+import io.github.kotlinmania.unicodesegmentation.unicodeWords
+
 /** Languages supported by the tokenizer. */
 enum class Language {
     Arabic,
@@ -48,32 +50,110 @@ private fun normalizeText(text: String): String =
         for (char in text) {
             append(
                 when (char) {
-                    '\u00e4', '\u00e1', '\u00e0', '\u00e2', '\u00e3', '\u00e5', '\u0101' -> "a"
-                    '\u00c4', '\u00c1', '\u00c0', '\u00c2', '\u00c3', '\u00c5', '\u0100' -> "A"
-                    '\u00e6' -> "ae"
-                    '\u00c6' -> "AE"
-                    '\u00e7', '\u0107', '\u010d' -> "c"
-                    '\u00c7', '\u0106', '\u010c' -> "C"
-                    '\u00e9', '\u00e8', '\u00ea', '\u00eb', '\u0113' -> "e"
-                    '\u00c9', '\u00c8', '\u00ca', '\u00cb', '\u0112' -> "E"
-                    '\u00ed', '\u00ec', '\u00ee', '\u00ef', '\u012b' -> "i"
-                    '\u00cd', '\u00cc', '\u00ce', '\u00cf', '\u012a' -> "I"
-                    '\u00f1' -> "n"
-                    '\u00d1' -> "N"
-                    '\u00f6', '\u00f3', '\u00f2', '\u00f4', '\u00f5', '\u014d' -> "o"
-                    '\u00d6', '\u00d3', '\u00d2', '\u00d4', '\u00d5', '\u014c' -> "O"
-                    '\u00f8' -> "o"
-                    '\u00d8' -> "O"
-                    '\u00df' -> "ss"
-                    '\u00fc', '\u00fa', '\u00f9', '\u00fb', '\u016b' -> "u"
-                    '\u00dc', '\u00da', '\u00d9', '\u00db', '\u016a' -> "U"
-                    '\u00fd', '\u00ff' -> "y"
-                    '\u00dd' -> "Y"
-                    '\ud83c' -> ""
-                    '\udf55' -> "pizza"
-                    '\ud83d' -> ""
-                    '\ude80' -> "rocket"
-                    '\udf4b' -> "lemon"
+                    '\u00e4', '\u00e1', '\u00e0', '\u00e2', '\u00e3', '\u00e5', '\u0101' -> {
+                        "a"
+                    }
+
+                    '\u00c4', '\u00c1', '\u00c0', '\u00c2', '\u00c3', '\u00c5', '\u0100' -> {
+                        "A"
+                    }
+
+                    '\u00e6' -> {
+                        "ae"
+                    }
+
+                    '\u00c6' -> {
+                        "AE"
+                    }
+
+                    '\u00e7', '\u0107', '\u010d' -> {
+                        "c"
+                    }
+
+                    '\u00c7', '\u0106', '\u010c' -> {
+                        "C"
+                    }
+
+                    '\u00e9', '\u00e8', '\u00ea', '\u00eb', '\u0113' -> {
+                        "e"
+                    }
+
+                    '\u00c9', '\u00c8', '\u00ca', '\u00cb', '\u0112' -> {
+                        "E"
+                    }
+
+                    '\u00ed', '\u00ec', '\u00ee', '\u00ef', '\u012b' -> {
+                        "i"
+                    }
+
+                    '\u00cd', '\u00cc', '\u00ce', '\u00cf', '\u012a' -> {
+                        "I"
+                    }
+
+                    '\u00f1' -> {
+                        "n"
+                    }
+
+                    '\u00d1' -> {
+                        "N"
+                    }
+
+                    '\u00f6', '\u00f3', '\u00f2', '\u00f4', '\u00f5', '\u014d' -> {
+                        "o"
+                    }
+
+                    '\u00d6', '\u00d3', '\u00d2', '\u00d4', '\u00d5', '\u014c' -> {
+                        "O"
+                    }
+
+                    '\u00f8' -> {
+                        "o"
+                    }
+
+                    '\u00d8' -> {
+                        "O"
+                    }
+
+                    '\u00df' -> {
+                        "ss"
+                    }
+
+                    '\u00fc', '\u00fa', '\u00f9', '\u00fb', '\u016b' -> {
+                        "u"
+                    }
+
+                    '\u00dc', '\u00da', '\u00d9', '\u00db', '\u016a' -> {
+                        "U"
+                    }
+
+                    '\u00fd', '\u00ff' -> {
+                        "y"
+                    }
+
+                    '\u00dd' -> {
+                        "Y"
+                    }
+
+                    '\ud83c' -> {
+                        ""
+                    }
+
+                    '\udf55' -> {
+                        "pizza"
+                    }
+
+                    '\ud83d' -> {
+                        ""
+                    }
+
+                    '\ude80' -> {
+                        "rocket"
+                    }
+
+                    '\udf4b' -> {
+                        "lemon"
+                    }
+
                     else -> {
                         if (char.code <= 0x7f) {
                             char.toString()
@@ -232,7 +312,10 @@ class DefaultTokenizer private constructor(
     override fun tokenize(inputText: String): List<String> {
         if (inputText.isEmpty()) return emptyList()
         return when (val resources = resources) {
-            is Resources.Static -> tokenize(inputText, resources.components)
+            is Resources.Static -> {
+                tokenize(inputText, resources.components)
+            }
+
             is Resources.Dynamic -> {
                 val detectedLanguage = detectLanguage(inputText)
                 val components = Components(resources.settings, detectedLanguage)
@@ -288,31 +371,7 @@ class DefaultTokenizer private constructor(
             }
         }
 
-        private fun splitOnWordBoundaries(text: String): List<String> {
-            val tokens = ArrayList<String>()
-            val current = StringBuilder()
-
-            fun flush() {
-                if (current.isNotEmpty()) {
-                    tokens.add(current.toString())
-                    current.clear()
-                }
-            }
-
-            for (index in text.indices) {
-                val char = text[index]
-                val insideToken = current.isNotEmpty()
-                val nextIsWord = index + 1 < text.length && text[index + 1].isLetterOrDigit()
-                when {
-                    char.isLetterOrDigit() -> current.append(char)
-                    insideToken && (char == '\'' || char == '\u2019' || char == '.') && nextIsWord ->
-                        current.append(char)
-                    else -> flush()
-                }
-            }
-            flush()
-            return tokens.filter { it.isNotEmpty() }
-        }
+        private fun splitOnWordBoundaries(text: String): Sequence<String> = text.unicodeWords().filter { it.isNotEmpty() }
     }
 }
 

@@ -1,4 +1,3 @@
-// port-lint: source default_tokenizer.rs
 package io.github.kotlinmania.bm25
 
 // Porter stemmer algorithm, matching the behaviour of the Snowball English stemmer.

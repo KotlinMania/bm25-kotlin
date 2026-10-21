@@ -1,4 +1,3 @@
-// port-lint: ignore
 // Local port of the upstream `fxhash` 0.2.1 crate (https://crates.io/crates/fxhash) used by
 // `bm25` for token hashing. This is a temporary in-tree port; once a `fxhash-kotlin` sibling
 // repo exists it should be extracted there. The output matches upstream byte-for-byte for

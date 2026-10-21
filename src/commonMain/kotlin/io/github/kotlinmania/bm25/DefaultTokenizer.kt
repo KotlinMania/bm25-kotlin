@@ -150,6 +150,10 @@ private fun normalizeText(text: String): String =
                         "rocket"
                     }
 
+                    '\udd25' -> {
+                        "fire"
+                    }
+
                     '\udf4b' -> {
                         "lemon"
                     }

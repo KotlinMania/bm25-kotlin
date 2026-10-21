@@ -33,6 +33,11 @@ class Embedding<D>(
     override fun hashCode(): Int = tokens.hashCode()
 
     override fun toString(): String = "Embedding($tokens)"
+
+    companion object {
+        /** Creates an embedding for testing. */
+        fun any(): Embedding<UInt> = Embedding(listOf(TokenEmbedding(1u, 1.0f)))
+    }
 }
 
 /** A trait for embedding. Implement this to customise the embedding space and function. */

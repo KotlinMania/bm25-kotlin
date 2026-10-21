@@ -37,6 +37,49 @@ class EmbedderTest {
     }
 
     @Test
+    fun itWeightsRepeatedWordsUnequally() {
+        val embedder =
+            EmbedderBuilder
+                .withAvgdl(UIntTokenEmbedder, DefaultTokenizer.new(Language.English), 3.0f)
+                .build()
+        val embedding = embedder.embed("space station station")
+
+        assertEquals(
+            listOf(
+                TokenEmbedding(866767497u, 1.0f),
+                TokenEmbedding(666609503u, 1.375f),
+                TokenEmbedding(666609503u, 1.375f),
+            ),
+            embedding.toList(),
+        )
+    }
+
+    @Test
+    fun itConstrainsAvgdl() {
+        val embedder =
+            EmbedderBuilder
+                .withAvgdl(UIntTokenEmbedder, DefaultTokenizer.new(Language.English), 0.0f)
+                .build()
+
+        val embedding = embedder.embed("space station")
+
+        assertTrue(embedding.isNotEmpty())
+        assertTrue(embedding.all { it.value > 0.0f })
+    }
+
+    @Test
+    fun itHandlesEmptyCorpus() {
+        val embedder =
+            EmbedderBuilder
+                .withFitToCorpus(Language.English, emptyList())
+                .build()
+
+        val embedding = embedder.embed("space station")
+
+        assertTrue(embedding.isNotEmpty())
+    }
+
+    @Test
     fun itHandlesEmptyInput() {
         val embedder =
             EmbedderBuilder

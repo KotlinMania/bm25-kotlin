@@ -111,4 +111,9 @@ class Scorer<K, D> {
         }
         return documentScore
     }
+
+    companion object {
+        /** Creates a new, empty [Scorer]. */
+        fun <K, D> new(): Scorer<K, D> = Scorer()
+    }
 }
